@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#1a1a2e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>BIM — Rencontre Linguistique</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --c1: #1a1a2e;
+    --c2: #16213e;
+    --c3: #0f3460;
+    --accent: #e94560;
+    --gold: #f5a623;
+    --mint: #4ecdc4;
+    --soft: #f8f4ef;
+    --card: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.12);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--c1);
+    color: var(--soft);
+    min-height: 100dvh;
+    margin: 0;
+    overflow-x: hidden;
+  }
+  .fraunces { font-family: 'Fraunces', serif; }
+  .screen { display:none; min-height:100dvh; flex-direction:column; }
+  .screen.active { display:flex; }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+  .btn-ghost {
+    background: var(--card);
+    color: var(--soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .btn-ghost:active { transform: scale(0.97); background: rgba(255,255,255,0.12); }
+  .btn-mint {
+    background: var(--mint);
+    color: var(--c1);
+    border: none;
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .btn-mint:active { transform: scale(0.97); }
+  .flag-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 10px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .flag-btn:active { transform: scale(0.94); }
+  .flag-btn.selected { border-color: var(--accent); background: rgba(233,69,96,0.15); color: var(--soft); }
+  .flag-btn .flag { font-size: 28px; line-height: 1; }
+  .input-field {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--soft);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  .input-field::placeholder { color: rgba(255,255,255,0.3); }
+  select.input-field option { background: var(--c2); color: var(--soft); }
+  .card-glass {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+  }
+  .timer-ring { transition: stroke-dashoffset 1s linear; }
+  .mic-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .mic-btn.recording { background: rgba(233,69,96,0.3); border-color: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .flip-card { perspective: 800px; cursor: pointer; }
+  .flip-card-inner { transition: transform 0.5s; transform-style: preserve-3d; position: relative; }
+  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+  .flip-card-front, .flip-card-back {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    padding: 24px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 140px;
+    text-align: center;
+  }
+  .flip-card-back { transform: rotateY(180deg); position: absolute; top:0; left:0; right:0; bottom:0; }
+  .phrase-card {
+    background: linear-gradient(135deg, rgba(233,69,96,0.2), rgba(78,205,196,0.1));
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .phrase-card:active { transform: scale(0.98); }
+  .phrase-card.selected { border-color: var(--accent); background: linear-gradient(135deg, rgba(233,69,96,0.3), rgba(78,205,196,0.2)); }
+  .split-top {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(180deg, rgba(78,205,196,0.1) 0%, transparent 100%);
+    text-align: center;
+  }
+  .split-bottom {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(0deg, rgba(233,69,96,0.12) 0%, transparent 100%);
+    text-align: center;
+    transform: rotate(180deg);
+  }
+  .divider-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 0;
+  }
+  .activity-badge {
+    display: inline-block;
+    background: rgba(245,166,35,0.2);
+    border: 1px solid rgba(245,166,35,0.4);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .season-icon { font-size: 32px; line-height: 1; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation: fadeIn 0.35s ease forwards; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  .slide-up { animation: slideUp 0.4s ease forwards; }
+  .dots-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .z1 { position: relative; z-index: 1; }
+  .progress-bar { background: rgba(255,255,255,0.1); border-radius: 99px; height: 4px; overflow: hidden; }
+  .progress-fill { background: var(--accent); height: 100%; border-radius: 99px; transition: width 0.3s; }
+  .number-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 70px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+  }
+  .number-card:active { transform: scale(0.94); }
+  .number-card.revealed { background: rgba(78,205,196,0.15); border-color: var(--mint); }
+</style>
+</head>
+<body>
+<div class="dots-bg"></div>
+
+<!-- ===== SCREEN: SPLASH ===== -->
+<div id="screen-splash" class="screen active items-center justify-center" style="padding:32px">
+  <div class="z1 text-center slide-up">
+    <div style="font-size:72px;margin-bottom:16px">🌍</div>
+    <h1 class="fraunces" style="font-size:52px;font-weight:700;margin:0;line-height:1;letter-spacing:-2px">BIM</h1>
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:8px 0 0;letter-spacing:2px;text-transform:uppercase">Rencontre Linguistique</p>
+    <div style="width:48px;height:2px;background:var(--accent);margin:20px auto"></div>
+    <p style="color:rgba(255,255,255,0.6);font-size:15px;line-height:1.6;margin-bottom:40px">Brisez la glace avec n'importe qui,<br/>dans n'importe quelle langue.</p>
+    <button class="btn-primary" onclick="go('screen-lang-source')">Commencer →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: CHOOSE SOURCE LANGUAGE ===== -->
+<div id="screen-lang-source" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in" style="padding-top:20px">
+    <div style="margin-bottom:24px">
+      <p style="color:rgba(255,255,255,0.4);font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 6px">Étape 1 / 3</p>
+      <h2 class="fraunces" style="font-size:28px;font-weight:600;margin:0">Quelle est<br/>votre langue ?</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px" id="grid-source"></div>
+    <button class="btn-primary" id="btn-next-source" style="opacity:0.4;pointer-events:none" onclick="go('screen-lang-target')">Suivant →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: CHOOSE TARGET LANGUAGE ===== -->
+<div id="screen-lang-target" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in" style="padding-top:20px">
+    <button onclick="go('screen-lang-source')" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;padding:0;margin-bottom:16px">← Retour</button>
+    <div style="margin-bottom:24px">
+      <p style="color:rgba(255,255,255,0.4);font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 6px">Étape 2 / 3</p>
+      <h2 class="fraunces" style="font-size:28px;font-weight:600;margin:0">Quelle langue<br/>parle-t-il/elle ?</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px" id="grid-target"></div>
+    <button class="btn-primary" id="btn-next-target" style="opacity:0.4;pointer-events:none" onclick="go('screen-profile')">Suivant →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: PROFILE ===== -->
+<div id="screen-profile" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in" style="padding-top:20px">
+    <button onclick="go('screen-lang-target')" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;padding:0;margin-bottom:16px">← Retour</button>
+    <div style="margin-bottom:24px">
+      <p style="color:rgba(255,255,255,0.4);font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 6px">Étape 3 / 3</p>
+      <h2 class="fraunces" style="font-size:28px;font-weight:600;margin:0">Votre profil</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px">
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Prénom</label>
+        <input class="input-field" id="inp-name" type="text" placeholder="Votre prénom" autocomplete="off"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Âge</label>
+        <input class="input-field" id="inp-age" type="number" placeholder="Votre âge" min="10" max="99"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Sexe</label>
+        <select class="input-field" id="inp-gender">
+          <option value="">— Sélectionner —</option>
+          <option value="Homme">Homme</option>
+          <option value="Femme">Femme</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Pays</label>
+        <input class="input-field" id="inp-country" type="text" placeholder="Votre pays d'origine" autocomplete="off"/>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveProfile()">Créer mon profil ✓</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: HOME ===== -->
+<div id="screen-home" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in" style="padding-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h1 class="fraunces" style="font-size:32px;margin:0;font-weight:700">BIM</h1>
+        <p style="margin:2px 0 0;font-size:13px;color:rgba(255,255,255,0.4)" id="home-subtitle"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="home-flags" style="font-size:22px"></span>
+        <button onclick="go('screen-profile-edit')" style="background:var(--card);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;color:rgba(255,255,255,0.6);cursor:pointer;font-size:16px">✎</button>
+      </div>
+    </div>
+
+    <div class="card-glass" style="padding:20px;margin-bottom:20px">
+      <p style="font-size:12px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.4);margin:0 0 14px">Mode Approche — Choisissez une phrase</p>
+      <div id="phrase-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <button class="btn-mint" id="btn-approach" style="opacity:0.4;pointer-events:none" onclick="showSplitScreen()">
+      Tendre le téléphone →
+    </button>
+    <p style="text-align:center;font-size:12px;color:rgba(255,255,255,0.3);margin-top:10px">Sélectionnez une phrase pour continuer</p>
+  </div>
+</div>
+
+<!-- ===== SCREEN: SPLIT SCREEN (approach) ===== -->
+<div id="screen-split" class="screen" style="position:relative">
+  <div class="split-top z1">
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px" id="split-you-label"></p>
+    <p class="fraunces" style="font-size:22px;font-weight:400;line-height:1.5;margin:0" id="split-phrase-src"></p>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:10px">
+      <span id="split-src-flag" style="font-size:28px"></span>
+      <span id="split-src-name" style="font-size:14px;color:rgba(255,255,255,0.5)"></span>
+    </div>
+  </div>
+  <div class="divider-line z1"></div>
+  <div class="split-bottom z1">
+    <div style="transform:rotate(180deg);width:100%;display:flex;flex-direction:column;align-items:center">
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px" id="split-them-label"></p>
+      <p class="fraunces" style="font-size:30px;font-weight:600;line-height:1.4;margin:0 0 20px;color:var(--mint)" id="split-phrase-tgt"></p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+        <span id="split-tgt-flag" style="font-size:28px"></span>
+        <span id="split-tgt-name" style="font-size:13px;color:rgba(255,255,255,0.5)"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px">
+        <button class="btn-ghost" onclick="go('screen-home')" style="font-size:14px" id="btn-no">😕 Non désolé</button>
+        <button class="btn-primary" onclick="startMode('B')" style="font-size:14px" id="btn-2min">⚡ Ok, j'ai 2 min !</button>
+        <button class="btn-mint" onclick="startMode('C')" style="font-size:14px" id="btn-10min">📚 Ok, j'ai 10 min !</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: MODE B (2 min Flash) ===== -->
+<div id="screen-mode-b" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <span class="activity-badge">⚡ Mode Flash</span>
+        <h2 class="fraunces" style="font-size:22px;margin:8px 0 0" id="b-activity-title">Activité</h2>
+      </div>
+      <div style="text-align:center">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+          <circle id="timer-b-ring" cx="32" cy="32" r="28" fill="none" stroke="var(--accent)" stroke-width="4"
+            stroke-dasharray="176" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 32 32)" class="timer-ring"/>
+        </svg>
+        <div style="margin-top:-48px;height:64px;display:flex;align-items:center;justify-content:center">
+          <span id="timer-b-display" style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">2:00</span>
+        </div>
+      </div>
+    </div>
+    <div id="b-content" style="margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-ghost" onclick="endSession()" style="flex:1">Terminer</button>
+      <button class="btn-primary" onclick="nextActivityB()" style="flex:1">Suivant ⟳</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: MODE C (10 min Learning) ===== -->
+<div id="screen-mode-c" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <span class="activity-badge" style="background:rgba(78,205,196,0.2);border-color:rgba(78,205,196,0.4);color:var(--mint)">📚 Mode Apprentissage</span>
+      </div>
+      <div style="text-align:center">
+        <svg width="56" height="56" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+          <circle id="timer-c-ring" cx="32" cy="32" r="28" fill="none" stroke="var(--mint)" stroke-width="4"
+            stroke-dasharray="176" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 32 32)" class="timer-ring"/>
+        </svg>
+        <div style="margin-top:-44px;height:56px;display:flex;align-items:center;justify-content:center">
+          <span id="timer-c-display" style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums">10:00</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-bottom:20px">
+      <div class="progress-fill" id="c-progress" style="width:0%"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap" id="c-menu"></div>
+    <div id="c-content" style="margin-bottom:16px"></div>
+    <button class="btn-ghost" onclick="endSession()" style="margin-top:8px">Terminer la session</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: CLOSURE ===== -->
+<div id="screen-closure" class="screen items-center justify-center" style="padding:32px">
+  <div class="z1 text-center slide-up" style="width:100%">
+    <div style="font-size:52px;margin-bottom:16px" id="closure-icon">👋</div>
+    <h2 class="fraunces" style="font-size:28px;font-weight:600;margin:0 0 8px" id="closure-title"></h2>
+    <p style="color:rgba(255,255,255,0.5);font-size:15px;line-height:1.6;margin-bottom:28px" id="closure-msg"></p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+      <button class="btn-mint" onclick="showContact()">✅ OK pour garder le contact</button>
+      <button class="btn-ghost" onclick="go('screen-home')">🙏 Non merci — À bientôt</button>
+    </div>
+    <div id="contact-form" style="display:none">
+      <div class="card-glass" style="padding:20px;text-align:left">
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0 0 10px">Votre WhatsApp ou numéro :</p>
+        <input class="input-field" id="inp-contact" type="tel" placeholder="+33 6 00 00 00 00"/>
+        <button class="btn-primary" onclick="saveContact()" style="margin-top:12px">Enregistrer 💾</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:20px" id="closure-byline"></p>
+  </div>
+</div>
+
+<!-- ===== SCREEN: PROFILE EDIT ===== -->
+<div id="screen-profile-edit" class="screen" style="padding:24px;overflow-y:auto">
+  <div class="z1 fade-in" style="padding-top:20px">
+    <button onclick="go('screen-home')" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;padding:0;margin-bottom:20px">← Retour</button>
+    <h2 class="fraunces" style="font-size:28px;margin:0 0 20px">Modifier le profil</h2>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px">
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Prénom</label>
+        <input class="input-field" id="edit-name" type="text"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Âge</label>
+        <input class="input-field" id="edit-age" type="number"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Sexe</label>
+        <select class="input-field" id="edit-gender">
+          <option value="Homme">Homme</option>
+          <option value="Femme">Femme</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Pays</label>
+        <input class="input-field" id="edit-country" type="text"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Langue source</label>
+        <div id="edit-lang-src" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block">Langue cible</label>
+        <div id="edit-lang-tgt" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="updateProfile()">Mettre à jour ✓</button>
+    <button class="btn-ghost" onclick="resetApp()" style="margin-top:10px;color:rgba(233,69,96,0.8);border-color:rgba(233,69,96,0.3)">Réinitialiser l'app</button>
+  </div>
+</div>
+
+<script>
+// ===== LANGUAGE DATA =====
+const LANGS = [
+  { code:'fr', name:'Français', flag:'🇫🇷', shortName:'Français' },
+  { code:'en', name:'English', flag:'🇬🇧', shortName:'English' },
+  { code:'es', name:'Español', flag:'🇪🇸', shortName:'Español' },
+  { code:'it', name:'Italiano', flag:'🇮🇹', shortName:'Italiano' },
+  { code:'ar', name:'العربية', flag:'🇲🇦', shortName:'العربية' },
+  { code:'fa', name:'فارسی', flag:'🇮🇷', shortName:'فارسی' },
+  { code:'da', name:'Dari', flag:'🇦🇫', shortName:'Dari' },
+  { code:'hi', name:'हिन्दी', flag:'🇮🇳', shortName:'हिन्दी' },
+  { code:'bg', name:'Български', flag:'🇧🇬', shortName:'Български' },
+  { code:'pt', name:'Português', flag:'🇧🇷', shortName:'Português' },
+  { code:'ber', name:'Tamazight', flag:'🏔️', shortName:'ⵜⴰⵎⴰⵣⵉⵖⵜ' },
+  { code:'zh', name:'中文', flag:'🇨🇳', shortName:'中文' },
+  { code:'ko', name:'한국어', flag:'🇰🇷', shortName:'한국어' },
+  { code:'ja', name:'日本語', flag:'🇯🇵', shortName:'日本語' },
+  { code:'vi', name:'Tiếng Việt', flag:'🇻🇳', shortName:'Tiếng Việt' },
+];
+
+const T = {
+  hello: {
+    fr:'Bonjour !', en:'Hello!', es:'¡Hola!', it:'Ciao!', ar:'مرحبا!',
+    fa:'سلام!', da:'سلام!', hi:'नमस्ते!', bg:'Здравейте!', pt:'Olá!',
+    ber:'ⴰⵣⵓⵍ!', zh:'你好!', ko:'안녕하세요!', ja:'こんにちは!', vi:'Xin chào!'
+  },
+  howAreYou: {
+    fr:'Comment vas-tu ?', en:'How are you?', es:'¿Cómo estás?', it:'Come stai?',
+    ar:'كيف حالك؟', fa:'حال شما چطور است؟', da:'حال شما چطور است؟',
+    hi:'आप कैसे हैं?', bg:'Как си?', pt:'Como vai você?',
+    ber:'Amek thelleḍ?', zh:'你好吗?', ko:'어떻게 지내세요?', ja:'お元気ですか?', vi:'Bạn có khỏe không?'
+  },
+  myNameIs: {
+    fr:'Je m\'appelle', en:'My name is', es:'Me llamo', it:'Mi chiamo',
+    ar:'اسمي', fa:'اسم من', da:'نام من', hi:'मेरा नाम है', bg:'Казвам се',
+    pt:'Meu nome é', ber:'Isem inu d', zh:'我叫', ko:'제 이름은', ja:'私の名前は', vi:'Tên tôi là'
+  },
+  iAmYearsOld: {
+    fr:'J\'ai {age} ans', en:'I am {age} years old', es:'Tengo {age} años',
+    it:'Ho {age} anni', ar:'عمري {age} سنة', fa:'من {age} ساله هستم',
+    da:'من {age} ساله هستم', hi:'मेरी उम्र {age} साल है', bg:'На {age} години съм',
+    pt:'Tenho {age} anos', ber:'Aḍad-iw d {age} iseggasen', zh:'我{age}岁', ko:'저는 {age}살이에요', ja:'私は{age}歳です', vi:'Tôi {age} tuổi'
+  },
+  iComeFrom: {
+    fr:'Je viens de', en:'I come from', es:'Vengo de', it:'Vengo da',
+    ar:'أنا من', fa:'من اهل', da:'من اهل', hi:'मैं से आता/आती हूँ',
+    bg:'Идвам от', pt:'Sou de', ber:'Akal-iw d', zh:'我来自', ko:'저는 에서 왔어요', ja:'私は から来ました', vi:'Tôi đến từ'
+  },
+  goodbye: {
+    fr:'Au revoir !', en:'Goodbye!', es:'¡Adiós!', it:'Arrivederci!',
+    ar:'وداعاً!', fa:'خداحافظ!', da:'خداحافظ!', hi:'अलविदा!', bg:'Довиждане!',
+    pt:'Tchau!', ber:'Azul!', zh:'再见!', ko:'안녕히 가세요!', ja:'さようなら!', vi:'Tạm biệt!'
+  },
+  thankyou: {
+    fr:'Merci !', en:'Thank you!', es:'¡Gracias!', it:'Grazie!',
+    ar:'شكراً!', fa:'ممنون!', da:'تشکر!', hi:'धन्यवाद!', bg:'Благодаря!',
+    pt:'Obrigado/a!', ber:'Tanmirt!', zh:'谢谢!', ko:'감사합니다!', ja:'ありがとう!', vi:'Cảm ơn!'
+  },
+  whatsYourName: {
+    fr:'Comment tu t\'appelles ?', en:'What is your name?', es:'¿Cómo te llamas?',
+    it:'Come ti chiami?', ar:'ما اسمك؟', fa:'اسم شما چیست؟', da:'اسم شما چیست؟',
+    hi:'आपका नाम क्या है?', bg:'Как се казваш?', pt:'Qual é o seu nome?',
+    ber:'Acu d isem-ik?', zh:'你叫什么名字?', ko:'이름이 뭐예요?', ja:'お名前は?', vi:'Tên bạn là gì?'
+  },
+  imAngry: {
+    fr:'Je suis en colère !', en:'I am angry!', es:'¡Estoy enojado/a!',
+    it:'Sono arrabbiato/a!', ar:'أنا غاضب!', fa:'من عصبانی هستم!', da:'من خشمگین هستم!',
+    hi:'मुझे गुस्सा आ रहा है!', bg:'Ядосан/а съм!', pt:'Estou com raiva!',
+    ber:'Cεlen-iɣ!', zh:'我很生气!', ko:'화가 났어요!', ja:'怒っています!', vi:'Tôi đang tức giận!'
+  },
+  congratulations: {
+    fr:'Félicitations !', en:'Congratulations!', es:'¡Felicitaciones!', it:'Congratulazioni!',
+    ar:'تهانيّ!', fa:'تبریک!', da:'مبارک باشد!', hi:'बधाई हो!', bg:'Поздравления!',
+    pt:'Parabéns!', ber:'Ayyu!', zh:'恭喜!', ko:'축하합니다!', ja:'おめでとう!', vi:'Xin chúc mừng!'
+  },
+  apprentice: {
+    fr:'Apprenti', en:'Apprentice', es:'Aprendiz', it:'Apprendista', ar:'مبتدئ',
+    fa:'مبتدی', da:'مبتدی', hi:'शिक्षार्थी', bg:'Начинаещ', pt:'Aprendiz',
+    ber:'Anelmad', zh:'学徒', ko:'초보자', ja:'初心者', vi:'Người học'
+  },
+  curious: {
+    fr:'Curieux', en:'Curious', es:'Curioso', it:'Curioso', ar:'فضولي',
+    fa:'کنجکاو', da:'کنجکاو', hi:'जिज्ञासु', bg:'Любопитен', pt:'Curioso',
+    ber:'Anaẓnuz', zh:'好奇的', ko:'호기심 많은', ja:'好奇心旺盛', vi:'Tò mò'
+  },
+  pragmatic: {
+    fr:'Pragmatique', en:'Pragmatic', es:'Pragmático', it:'Pragmatico', ar:'عملي',
+    fa:'عملگرا', da:'عملگرا', hi:'व्यावहारिक', bg:'Прагматичен', pt:'Pragmático',
+    ber:'Aɣilif', zh:'务实的', ko:'현실적인', ja:'実際的', vi:'Thực dụng'
+  },
+  longestWord: {
+    fr:'Anticonstitutionnellement', en:'Pneumonoultramicroscopicsilicovolcanoconiosis',
+    es:'Esternocleidomastoideo', it:'Precipitevolissimevolmente', ar:'فاستعصموا', 
+    fa:'دوست‌داشتنی‌ترین', da:'خوشبختانه', hi:'सर्वोच्चन्यायालय', bg:'Непредизвикателства',
+    pt:'Inconstitucionalissimamente', ber:'Asegzawal', zh:'坐', ko:'청산리벽계수야', ja:'東京特許許可局', vi:'Nghiêng'
+  },
+  numbers: {
+    fr:['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix'],
+    en:['zero','one','two','three','four','five','six','seven','eight','nine','ten'],
+    es:['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez'],
+    it:['zero','uno','due','tre','quattro','cinque','sei','sette','otto','nove','dieci'],
+    ar:['صفر','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة'],
+    fa:['صفر','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه','ده'],
+    da:['صفر','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه','ده'],
+    hi:['शून्य','एक','दो','तीन','चार','पाँच','छः','सात','आठ','नौ','दस'],
+    bg:['нула','едно','две','три','четири','пет','шест','седем','осем','девет','десет'],
+    pt:['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez'],
+    ber:['meẓẓi','yiwen','snat','kraḍ','kuẓ','semmus','sḍis','sa','tam','tẓa','mraw'],
+    zh:['零','一','二','三','四','五','六','七','八','九','十'],
+    ko:['영','일','이','삼','사','오','육','칠','팔','구','십'],
+    ja:['ゼロ','いち','に','さん','し','ご','ろく','なな','はち','きゅう','じゅう'],
+    vi:['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín','mười']
+  },
+  months: {
+    fr:['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+    en:['January','February','March','April','May','June','July','August','September','October','November','December'],
+    es:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+    it:['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+    ar:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
+    fa:['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'],
+    da:['جنوری','فبروری','مارچ','اپریل','می','جون','جولای','آگست','سپتامبر','اکتوبر','نوامبر','دسامبر'],
+    hi:['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितम्बर','अक्टूबर','नवम्बर','दिसम्बर'],
+    bg:['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'],
+    pt:['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+    ber:['Yennayer','Furar','Meɣres','Yebrir','Mayyu','Yunyu','Yulyu','Ɣuct','Ctembeṛ','Tubeṛ','Nunembeṛ','Dujembeṛ'],
+    zh:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+    ko:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+    ja:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+    vi:['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12']
+  },
+  seasons: {
+    fr:['Printemps','Été','Automne','Hiver'],
+    en:['Spring','Summer','Autumn','Winter'],
+    es:['Primavera','Verano','Otoño','Invierno'],
+    it:['Primavera','Estate','Autunno','Inverno'],
+    ar:['الربيع','الصيف','الخريف','الشتاء'],
+    fa:['بهار','تابستان','پاییز','زمستان'],
+    da:['بهار','تابستان','خزان','زمستان'],
+    hi:['वसंत','ग्रीष्म','शरद','शीत'],
+    bg:['Пролет','Лято','Есен','Зима'],
+    pt:['Primavera','Verão','Outono','Inverno'],
+    ber:['Awrir','Anebdu','Axurif','Tagrst'],
+    zh:['春天','夏天','秋天','冬天'],
+    ko:['봄','여름','가을','겨울'],
+    ja:['春','夏','秋','冬'],
+    vi:['Mùa xuân','Mùa hè','Mùa thu','Mùa đông']
+  },
+  phrases: {
+    fr: [
+      { level:'Apprenti', text:'Bonjour ! Je voudrais parler avec vous.' },
+      { level:'Curieux', text:'Excusez-moi, je suis en train d\'apprendre votre langue !' },
+      { level:'Pragmatique', text:'Salut ! Tu peux m\'aider à pratiquer ?' }
+    ],
+    en: [
+      { level:'Apprentice', text:'Hello! I would like to talk with you.' },
+      { level:'Curious', text:'Excuse me, I am learning your language!' },
+      { level:'Pragmatic', text:'Hi! Can you help me practice?' }
+    ],
+    es: [
+      { level:'Aprendiz', text:'¡Hola! Me gustaría hablar contigo.' },
+      { level:'Curioso', text:'¡Perdona, estoy aprendiendo tu idioma!' },
+      { level:'Pragmático', text:'¡Hola! ¿Puedes ayudarme a practicar?' }
+    ],
+    it: [
+      { level:'Apprendista', text:'Ciao! Vorrei parlare con te.' },
+      { level:'Curioso', text:'Scusa, sto imparando la tua lingua!' },
+      { level:'Pragmatico', text:'Ciao! Mi puoi aiutare a praticare?' }
+    ],
+    ar: [
+      { level:'مبتدئ', text:'مرحباً! أود التحدث معك.' },
+      { level:'فضولي', text:'عذراً، أنا أتعلم لغتك!' },
+      { level:'عملي', text:'أهلاً! هل يمكنك مساعدتي في التدريب؟' }
+    ],
+    fa: [
+      { level:'مبتدی', text:'سلام! می‌خواهم با شما صحبت کنم.' },
+      { level:'کنجکاو', text:'ببخشید، دارم زبان شما را یاد می‌گیرم!' },
+      { level:'عملگرا', text:'سلام! می‌توانی به من در تمرین کمک کنی؟' }
+    ],
+    da: [
+      { level:'مبتدی', text:'سلام! می‌خواهم با شما صحبت کنم.' },
+      { level:'کنجکاو', text:'ببخشید، دارم زبان شما را یاد می‌گیرم!' },
+      { level:'عملگرا', text:'سلام! می‌توانی به من در تمرین کمک کنی؟' }
+    ],
+    hi: [
+      { level:'शिक्षार्थी', text:'नमस्ते! मैं आपसे बात करना चाहता/चाहती हूँ।' },
+      { level:'जिज्ञासु', text:'क्षमा करें, मैं आपकी भाषा सीख रहा/रही हूँ!' },
+      { level:'व्यावहारिक', text:'हाय! क्या आप मुझे अभ्यास करने में मदद कर सकते हैं?' }
+    ],
+    bg: [
+      { level:'Начинаещ', text:'Здравейте! Искам да поговорим.' },
+      { level:'Любопитен', text:'Извинете, уча вашия език!' },
+      { level:'Прагматичен', text:'Здрасти! Можеш ли да ми помогнеш да практикувам?' }
+    ],
+    pt: [
+      { level:'Aprendiz', text:'Olá! Eu gostaria de falar com você.' },
+      { level:'Curioso', text:'Desculpe, estou aprendendo sua língua!' },
+      { level:'Pragmático', text:'Oi! Você pode me ajudar a praticar?' }
+    ],
+    ber: [
+      { level:'Anelmad', text:'Azul! Ṛiɣ ad mmeslaɣ ak.' },
+      { level:'Anaẓnuz', text:'Suref-iyi, ttẓẓiɣ tutlayt-ik!' },
+      { level:'Aɣilif', text:'Azul! Tzeḍ ad yi-d-tɛawneḍ?' }
+    ],
+    zh: [
+      { level:'学徒', text:'你好！我想和你说话。' },
+      { level:'好奇', text:'对不起，我正在学习你的语言！' },
+      { level:'务实', text:'嗨！你能帮我练习吗？' }
+    ],
+    ko: [
+      { level:'초보자', text:'안녕하세요! 당신과 이야기하고 싶어요.' },
+      { level:'호기심', text:'실례합니다, 저는 당신의 언어를 배우고 있어요!' },
+      { level:'현실적', text:'안녕! 연습하는 것 도와줄 수 있어요?' }
+    ],
+    ja: [
+      { level:'初心者', text:'こんにちは！あなたと話したいです。' },
+      { level:'好奇心', text:'すみません、あなたの言語を勉強しています！' },
+      { level:'実際的', text:'やあ！練習するのを手伝ってもらえますか？' }
+    ],
+    vi: [
+      { level:'Người học', text:'Xin chào! Tôi muốn nói chuyện với bạn.' },
+      { level:'Tò mò', text:'Xin lỗi, tôi đang học tiếng của bạn!' },
+      { level:'Thực dụng', text:'Chào! Bạn có thể giúp tôi luyện tập không?' }
+    ]
+  },
+  phrasesTarget: {
+    fr: [
+      { level:'Apprenti', text:'Bonjour ! Je voudrais parler avec vous.' },
+      { level:'Curieux', text:'Excusez-moi, je suis en train d\'apprendre votre langue !' },
+      { level:'Pragmatique', text:'Salut ! Tu peux m\'aider à pratiquer ?' }
+    ],
+    en: [
+      { level:'Apprentice', text:'Hello! I would like to talk with you.' },
+      { level:'Curious', text:'Excuse me, I am learning your language!' },
+      { level:'Pragmatic', text:'Hi! Can you help me practice?' }
+    ],
+    es: [
+      { level:'Aprendiz', text:'¡Hola! Me gustaría hablar contigo.' },
+      { level:'Curioso', text:'¡Perdona, estoy aprendiendo tu idioma!' },
+      { level:'Pragmático', text:'¡Hola! ¿Puedes ayudarme a practicar?' }
+    ],
+    it: [
+      { level:'Apprendista', text:'Ciao! Vorrei parlare con te.' },
+      { level:'Curioso', text:'Scusa, sto imparando la tua lingua!' },
+      { level:'Pragmatico', text:'Ciao! Mi puoi aiutare a praticare?' }
+    ],
+    ar: [
+      { level:'مبتدئ', text:'مرحباً! أود التحدث معك.' },
+      { level:'فضولي', text:'عذراً، أنا أتعلم لغتك!' },
+      { level:'عملي', text:'أهلاً! هل يمكنك مساعدتي في التدريب؟' }
+    ],
+    fa: [
+      { level:'مبتدی', text:'سلام! می‌خواهم با شما صحبت کنم.' },
+      { level:'کنجکاو', text:'ببخشید، دارم زبان شما را یاد می‌گیرم!' },
+      { level:'عملگرا', text:'سلام! می‌توانی به من در تمرین کمک کنی؟' }
+    ],
+    da: [
+      { level:'مبتدی', text:'سلام! می‌خواهم با شما صحبت کنم.' },
+      { level:'کنجکاو', text:'ببخشید، دارم زبان شما را یاد می‌گیرم!' },
+      { level:'عملگرا', text:'سلام! می‌توانی به من در تمرین کمک کنی؟' }
+    ],
+    hi: [
+      { level:'शिक्षार्थी', text:'नमस्ते! मैं आपसे बात करना चाहता/चाहती हूँ।' },
+      { level:'जिज्ञासु', text:'क्षमा करें, मैं आपकी भाषा सीख रहा/रही हूँ!' },
+      { level:'व्यावहारिक', text:'हाय! क्या आप मुझे अभ्यास करने में मदद कर सकते हैं?' }
+    ],
+    bg: [
+      { level:'Начинаещ', text:'Здравейте! Искам да поговорим.' },
+      { level:'Любопитен', text:'Извинете, уча вашия език!' },
+      { level:'Прагматичен', text:'Здрасти! Можеш ли да ми помогнеш да практикувам?' }
+    ],
+    pt: [
+      { level:'Aprendiz', text:'Olá! Eu gostaria de falar com você.' },
+      { level:'Curioso', text:'Desculpe, estou aprendendo sua língua!' },
+      { level:'Pragmático', text:'Oi! Você pode me ajudar a praticar?' }
+    ],
+    ber: [
+      { level:'Anelmad', text:'Azul! Ṛiɣ ad mmeslaɣ ak.' },
+      { level:'Anaẓnuz', text:'Suref-iyi, ttẓẓiɣ tutlayt-ik!' },
+      { level:'Aɣilif', text:'Azul! Tzeḍ ad yi-d-tɛawneḍ?' }
+    ],
+    zh: [
+      { level:'学徒', text:'你好！我想和你说话。' },
+      { level:'好奇', text:'对不起，我正在学习你的语言！' },
+      { level:'务实', text:'嗨！你能帮我练习吗？' }
+    ],
+    ko: [
+      { level:'초보자', text:'안녕하세요! 당신과 이야기하고 싶어요.' },
+      { level:'호기심', text:'실례합니다, 저는 당신의 언어를 배우고 있어요!' },
+      { level:'현실적', text:'안녕! 연습하는 것 도와줄 수 있어요?' }
+    ],
+    ja: [
+      { level:'初心者', text:'こんにちは！あなたと話したいです。' },
+      { level:'好奇心', text:'すみません、あなたの言語を勉強しています！' },
+      { level:'実際的', text:'やあ！練習するのを手伝ってもらえますか？' }
+    ],
+    vi: [
+      { level:'Người học', text:'Xin chào! Tôi muốn nói chuyện với bạn.' },
+      { level:'Tò mò', text:'Xin lỗi, tôi đang học tiếng của bạn!' },
+      { level:'Thực dụng', text:'Chào! Bạn có thể giúp tôi luyện tập không?' }
+    ]
+  }
+};
+
+// ===== APP STATE =====
+let app = {
+  srcLang: null, tgtLang: null,
+  profile: { name:'', age:'', gender:'', country:'' },
+  selectedPhrase: null,
+  timerInterval: null,
+  timerLeft: 0,
+  timerTotal: 0,
+  currentMode: null,
+  recordingBtn: null,
+};
+
+function loadState() {
+  const saved = localStorage.getItem('bim_app');
+  if (saved) {
+    const data = JSON.parse(saved);
+    app.srcLang = data.srcLang || null;
+    app.tgtLang = data.tgtLang || null;
+    app.profile = data.profile || { name:'', age:'', gender:'', country:'' };
+  }
+}
+
+function saveState() {
+  localStorage.setItem('bim_app', JSON.stringify({
+    srcLang: app.srcLang, tgtLang: app.tgtLang, profile: app.profile
+  }));
+}
+
+// ===== NAVIGATION =====
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+  if (screenId === 'screen-home') renderHome();
+  if (screenId === 'screen-profile-edit') renderProfileEdit();
+  stopTimer();
+}
+
+// ===== FLAG GRIDS =====
+function renderFlagGrid(containerId, selectedCode, onSelect, nextBtnId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  LANGS.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.className = 'flag-btn' + (selectedCode === lang.code ? ' selected' : '');
+    btn.innerHTML = `<span class="flag">${lang.flag}</span><span>${lang.shortName.length > 8 ? lang.shortName.slice(0,7)+'…' : lang.shortName}</span>`;
+    btn.onclick = () => {
+      onSelect(lang.code);
+      el.querySelectorAll('.flag-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const nextBtn = document.getElementById(nextBtnId);
+      if (nextBtn) { nextBtn.style.opacity = '1'; nextBtn.style.pointerEvents = 'auto'; }
+    };
+    el.appendChild(btn);
+  });
+}
+
+// ===== PROFILE SAVE =====
+function saveProfile() {
+  const name = document.getElementById('inp-name').value.trim();
+  const age = document.getElementById('inp-age').value.trim();
+  const gender = document.getElementById('inp-gender').value;
+  const country = document.getElementById('inp-country').value.trim();
+  if (!name || !age || !gender || !country) {
+    alert('Veuillez remplir tous les champs.');
+    return;
+  }
+  app.profile = { name, age, gender, country };
+  saveState();
+  go('screen-home');
+}
+
+function updateProfile() {
+  app.profile.name = document.getElementById('edit-name').value.trim();
+  app.profile.age = document.getElementById('edit-age').value.trim();
+  app.profile.gender = document.getElementById('edit-gender').value;
+  app.profile.country = document.getElementById('edit-country').value.trim();
+  saveState();
+  go('screen-home');
+}
+
+// ===== HOME =====
+function renderHome() {
+  const src = LANGS.find(l => l.code === app.srcLang);
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+  document.getElementById('home-subtitle').textContent = `${app.profile.name}, ${app.profile.age} ans — ${app.profile.country}`;
+  document.getElementById('home-flags').textContent = `${src ? src.flag : '?'} → ${tgt ? tgt.flag : '?'}`;
+
+  const phraseList = document.getElementById('phrase-list');
+  const srcPhrases = (T.phrases[app.srcLang] || T.phrases['fr']);
+  const tgtPhrases = (T.phrases[app.tgtLang] || T.phrases['en']);
+  phraseList.innerHTML = '';
+
+  srcPhrases.forEach((p, i) => {
+    const tgt_p = tgtPhrases[i] || p;
+    const card = document.createElement('div');
+    card.className = 'phrase-card';
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="flex:1">
+          <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">${p.level}</span>
+          <p style="margin:4px 0 0;font-size:16px;line-height:1.5">${p.text}</p>
+          <p style="margin:6px 0 0;font-size:13px;color:rgba(78,205,196,0.7);line-height:1.4">${tgt_p.text}</p>
+        </div>
+      </div>`;
+    card.onclick = () => {
+      document.querySelectorAll('.phrase-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      app.selectedPhrase = { src: p, tgt: tgt_p };
+      const btn = document.getElementById('btn-approach');
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    };
+    phraseList.appendChild(card);
+  });
+}
+
+// ===== SPLIT SCREEN =====
+function showSplitScreen() {
+  if (!app.selectedPhrase) return;
+  const src = LANGS.find(l => l.code === app.srcLang);
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+  document.getElementById('split-phrase-src').textContent = app.selectedPhrase.src.text;
+  document.getElementById('split-phrase-tgt').textContent = app.selectedPhrase.tgt.text;
+  document.getElementById('split-src-flag').textContent = src ? src.flag : '';
+  document.getElementById('split-src-name').textContent = src ? src.name : '';
+  document.getElementById('split-tgt-flag').textContent = tgt ? tgt.flag : '';
+  document.getElementById('split-tgt-name').textContent = tgt ? tgt.name : '';
+  document.getElementById('split-you-label').textContent = '← Vous';
+
+  // Translate response buttons to target language
+  const noBtn = document.getElementById('btn-no');
+  const b2 = document.getElementById('btn-2min');
+  const b10 = document.getElementById('btn-10min');
+
+  // Simple translations for buttons
+  const btnTexts = {
+    fr:['😕 Non désolé','⚡ Ok, j\'ai 2 min !','📚 Ok, j\'ai 10 min !'],
+    en:['😕 No sorry','⚡ Ok, I have 2 min!','📚 Ok, I have 10 min!'],
+    es:['😕 No, lo siento','⚡ Ok, tengo 2 min!','📚 Ok, tengo 10 min!'],
+    it:['😕 No, mi dispiace','⚡ Ok, ho 2 min!','📚 Ok, ho 10 min!'],
+    ar:['😕 لا، آسف','⚡ حسناً، لدي 2 دقيقة!','📚 حسناً، لدي 10 دقائق!'],
+    fa:['😕 نه متأسفم','⚡ باشه، ۲ دقیقه وقت دارم!','📚 باشه، ۱۰ دقیقه وقت دارم!'],
+    da:['😕 نه متأسفم','⚡ باشه، ۲ دقیقه وقت دارم!','📚 باشه، ۱۰ دقیقه وقت دارم!'],
+    hi:['😕 नहीं, माफ़ करना','⚡ ठीक है, मेरे पास 2 मिनट हैं!','📚 ठीक है, मेरे पास 10 मिनट हैं!'],
+    bg:['😕 Не, съжалявам','⚡ Добре, имам 2 мин!','📚 Добре, имам 10 мин!'],
+    pt:['😕 Não, desculpe','⚡ Ok, tenho 2 min!','📚 Ok, tenho 10 min!'],
+    ber:['😕 Ala, suref-iyi','⚡ Ih, sɛiɣ 2 tisdatin!','📚 Ih, sɛiɣ 10 tisdatin!'],
+    zh:['😕 不，对不起','⚡ 好，我有2分钟！','📚 好，我有10分钟！'],
+    ko:['😕 아니요, 죄송해요','⚡ 좋아요, 2분 있어요!','📚 좋아요, 10분 있어요!'],
+    ja:['😕 いいえ、すみません','⚡ OK、2分あります！','📚 OK、10分あります！'],
+    vi:['😕 Không, xin lỗi','⚡ OK, tôi có 2 phút!','📚 OK, tôi có 10 phút!'],
+  };
+  const tl = app.tgtLang;
+  const texts = btnTexts[tl] || btnTexts['en'];
+  noBtn.textContent = texts[0];
+  b2.textContent = texts[1];
+  b10.textContent = texts[2];
+
+  go('screen-split');
+}
+
+// ===== MODES =====
+function startMode(mode) {
+  app.currentMode = mode;
+  if (mode === 'B') {
+    go('screen-mode-b');
+    startTimer(120, 'timer-b-display', 'timer-b-ring');
+    nextActivityB();
+  } else {
+    go('screen-mode-c');
+    startTimer(600, 'timer-c-display', 'timer-c-ring');
+    renderModeCMenu();
+    renderMirrorScript();
+  }
+}
+
+function startTimer(seconds, displayId, ringId) {
+  stopTimer();
+  app.timerLeft = seconds;
+  app.timerTotal = seconds;
+  const disp = document.getElementById(displayId);
+  const ring = document.getElementById(ringId);
+  const circumference = 176;
+
+  function tick() {
+    const m = Math.floor(app.timerLeft / 60);
+    const s = app.timerLeft % 60;
+    disp.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    const progress = app.timerLeft / app.timerTotal;
+    ring.style.strokeDashoffset = circumference * (1 - progress);
+    if (app.timerLeft <= 0) { stopTimer(); endSession(); return; }
+    app.timerLeft--;
+  }
+  tick();
+  app.timerInterval = setInterval(tick, 1000);
+}
+
+function stopTimer() {
+  if (app.timerInterval) { clearInterval(app.timerInterval); app.timerInterval = null; }
+}
+
+// ===== MODE B ACTIVITIES =====
+const activitiesB = [
+  { key:'prenom', title:'Prononciation du prénom', fn: renderPrenomActivity },
+  { key:'long', title:'Mot très long', fn: renderLongWord },
+  { key:'bonjour', title:'Bonjour / Au revoir', fn: renderBonjourAuRevoir },
+  { key:'appelle', title:'Comment tu t\'appelles ?', fn: renderTAppelles },
+  { key:'merci', title:'Merci / Félicitations', fn: renderMerciFelicitations },
+  { key:'fache', title:'Quand je suis fâché(e)', fn: renderFache },
+];
+let lastActivityB = -1;
+
+function nextActivityB() {
+  let idx;
+  do { idx = Math.floor(Math.random() * activitiesB.length); } while (idx === lastActivityB && activitiesB.length > 1);
+  lastActivityB = idx;
+  const act = activitiesB[idx];
+  document.getElementById('b-activity-title').textContent = act.title;
+  act.fn();
+}
+
+function micBtn(word) {
+  return `<button class="mic-btn" onclick="toggleMic(this,'${encodeURIComponent(word)}')" title="Simuler enregistrement">🎤</button>`;
+}
+
+function toggleMic(btn, word) {
+  if (btn.classList.contains('recording')) {
+    btn.classList.remove('recording');
+    btn.title = 'Simuler enregistrement';
+  } else {
+    document.querySelectorAll('.mic-btn.recording').forEach(b => b.classList.remove('recording'));
+    btn.classList.add('recording');
+    btn.title = 'Enregistrement en cours...';
+    setTimeout(() => btn.classList.remove('recording'), 3000);
+  }
+}
+
+function wordRow(srcWord, tgtWord) {
+  const src = LANGS.find(l => l.code === app.srcLang);
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+  return `
+  <div class="card-glass" style="padding:16px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+      <div>
+        <span style="font-size:11px;color:rgba(255,255,255,0.4)">${src ? src.flag : ''} ${src ? src.name : ''}</span>
+        <p style="margin:4px 0 0;font-size:20px;font-weight:600">${srcWord}</p>
+      </div>
+      ${micBtn(srcWord)}
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <span style="font-size:11px;color:rgba(78,205,196,0.6)">${tgt ? tgt.flag : ''} ${tgt ? tgt.name : ''}</span>
+        <p style="margin:4px 0 0;font-size:22px;font-weight:700;color:var(--mint)">${tgtWord}</p>
+      </div>
+      ${micBtn(tgtWord)}
+    </div>
+  </div>`;
+}
+
+function renderPrenomActivity() {
+  const name = app.profile.name || 'Marie';
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Apprenez à prononcer le prénom de votre interlocuteur !</p>
+    ${wordRow('Mon prénom est : ' + name, 'My name is: ' + name)}
+    <div class="card-glass" style="padding:14px;background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3)">
+      <p style="font-size:13px;color:var(--gold);margin:0">💡 Conseil : Répétez le prénom 3 fois, en souriant !</p>
+    </div>`;
+}
+
+function renderLongWord() {
+  const sw = T.longestWord[app.srcLang] || T.longestWord['fr'];
+  const tw = T.longestWord[app.tgtLang] || T.longestWord['en'];
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Le mot le plus long dans chaque langue !</p>
+    ${wordRow(sw, tw)}
+    <div class="card-glass" style="padding:14px;background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3)">
+      <p style="font-size:13px;color:var(--gold);margin:0">😄 Qui peut le prononcer le plus vite ?</p>
+    </div>`;
+}
+
+function renderBonjourAuRevoir() {
+  const sh = T.hello[app.srcLang] || 'Bonjour';
+  const th = T.hello[app.tgtLang] || 'Hello';
+  const sg = T.goodbye[app.srcLang] || 'Au revoir';
+  const tg = T.goodbye[app.tgtLang] || 'Goodbye';
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Les salutations essentielles !</p>
+    ${wordRow(sh, th)}
+    ${wordRow(sg, tg)}`;
+}
+
+function renderTAppelles() {
+  const sq = T.whatsYourName[app.srcLang] || 'Comment tu t\'appelles ?';
+  const tq = T.whatsYourName[app.tgtLang] || 'What is your name?';
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">La question clé pour faire connaissance !</p>
+    ${wordRow(sq, tq)}`;
+}
+
+function renderMerciFelicitations() {
+  const st = T.thankyou[app.srcLang] || 'Merci';
+  const tt = T.thankyou[app.tgtLang] || 'Thank you';
+  const sc = T.congratulations[app.srcLang] || 'Félicitations';
+  const tc = T.congratulations[app.tgtLang] || 'Congratulations';
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">La politesse en toutes langues !</p>
+    ${wordRow(st, tt)}
+    ${wordRow(sc, tc)}`;
+}
+
+function renderFache() {
+  const sa = T.imAngry[app.srcLang] || 'Je suis en colère !';
+  const ta = T.imAngry[app.tgtLang] || 'I am angry!';
+  document.getElementById('b-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Comment exprimer la colère... avec humour !</p>
+    ${wordRow(sa, ta)}
+    <div class="card-glass" style="padding:14px;background:rgba(233,69,96,0.1);border-color:rgba(233,69,96,0.3)">
+      <p style="font-size:13px;color:var(--accent);margin:0">🔥 À utiliser avec beaucoup de théâtre !</p>
+    </div>`;
+}
+
+// ===== MODE C =====
+const cModules = [
+  { id:'mirror', label:'📜 Script Miroir' },
+  { id:'numbers', label:'🔢 Chiffres 1-10' },
+  { id:'seasons', label:'🌸 Saisons & Mois' },
+];
+let activeCModule = 'mirror';
+
+function renderModeCMenu() {
+  const menu = document.getElementById('c-menu');
+  menu.innerHTML = '';
+  cModules.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = activeCModule === m.id ? 'btn-primary' : 'btn-ghost';
+    btn.style.cssText = 'flex:none;padding:10px 16px;font-size:13px;border-radius:12px;width:auto';
+    btn.textContent = m.label;
+    btn.onclick = () => {
+      activeCModule = m.id;
+      renderModeCMenu();
+      renderCContent(m.id);
+    };
+    menu.appendChild(btn);
+  });
+}
+
+function renderCContent(moduleId) {
+  if (moduleId === 'mirror') renderMirrorScript();
+  else if (moduleId === 'numbers') renderNumbers();
+  else if (moduleId === 'seasons') renderSeasons();
+}
+
+function renderMirrorScript() {
+  const src = LANGS.find(l => l.code === app.srcLang);
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+  const p = app.profile;
+  const mn = T.myNameIs[app.srcLang] || 'Je m\'appelle';
+  const mnt = T.myNameIs[app.tgtLang] || 'My name is';
+  const ia = (T.iAmYearsOld[app.srcLang] || 'J\'ai {age} ans').replace('{age}', p.age);
+  const iat = (T.iAmYearsOld[app.tgtLang] || 'I am {age} years old').replace('{age}', p.age);
+  const ic = T.iComeFrom[app.srcLang] || 'Je viens de';
+  const ict = T.iComeFrom[app.tgtLang] || 'I come from';
+  const hau = T.howAreYou[app.srcLang] || 'Comment vas-tu ?';
+  const haut = T.howAreYou[app.tgtLang] || 'How are you?';
+
+  const lines = [
+    [mn + ' ' + p.name, mnt + ' ' + p.name],
+    [ia, iat],
+    [ic + ' ' + p.country, ict + ' ' + p.country],
+    [hau, haut],
+    [T.thankyou[app.srcLang] || 'Merci', T.thankyou[app.tgtLang] || 'Thank you'],
+  ];
+
+  document.getElementById('c-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Présentez-vous phrase par phrase — votre interlocuteur répète !</p>
+    ${lines.map(([s,t]) => `
+    <div class="card-glass" style="padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+        <p style="margin:0;font-size:16px">${src ? src.flag : ''} ${s}</p>
+        ${micBtn(s)}
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <p style="margin:0;font-size:17px;font-weight:600;color:var(--mint)">${tgt ? tgt.flag : ''} ${t}</p>
+        ${micBtn(t)}
+      </div>
+    </div>`).join('')}`;
+}
+
+function renderNumbers() {
+  const srcNums = T.numbers[app.srcLang] || T.numbers['fr'];
+  const tgtNums = T.numbers[app.tgtLang] || T.numbers['en'];
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+
+  document.getElementById('c-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Touchez une carte pour révéler la traduction !</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      ${srcNums.map((n, i) => `
+      <div class="number-card flip-card" onclick="this.classList.toggle('revealed');this.classList.toggle('flipped')" id="nc-${i}">
+        <div style="font-size:24px;font-weight:700">${i}</div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.6)">${n}</div>
+        <div style="font-size:13px;color:var(--mint);opacity:0;transition:opacity 0.3s;margin-top:2px" id="nc-t-${i}">${tgtNums[i] || n}</div>
+        <style>#nc-${i}.revealed #nc-t-${i}{opacity:1}</style>
+      </div>`).join('')}
+    </div>`;
+}
+
+function renderSeasons() {
+  const seasonIcons = ['🌸','☀️','🍂','❄️'];
+  const monthIcons = ['🎊','❤️','🍀','🌷','🌺','☀️','🏖️','🌊','🍎','🎃','🍂','🎄'];
+  const srcSeas = T.seasons[app.srcLang] || T.seasons['fr'];
+  const tgtSeas = T.seasons[app.tgtLang] || T.seasons['en'];
+  const srcMon = T.months[app.srcLang] || T.months['fr'];
+  const tgtMon = T.months[app.tgtLang] || T.months['en'];
+
+  document.getElementById('c-content').innerHTML = `
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin:0 0 14px">Les saisons et les mois !</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px">
+      ${srcSeas.map((s, i) => `
+      <div class="card-glass" style="padding:14px;text-align:center">
+        <div class="season-icon">${seasonIcons[i]}</div>
+        <p style="margin:6px 0 2px;font-size:15px;font-weight:600">${s}</p>
+        <p style="margin:0;font-size:13px;color:var(--mint)">${tgtSeas[i] || s}</p>
+      </div>`).join('')}
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin:0 0 10px;text-transform:uppercase;letter-spacing:1px">Les mois</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${srcMon.map((m, i) => `
+      <div class="card-glass" style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">${monthIcons[i]}</span>
+        <div style="flex:1">
+          <span style="font-size:14px">${m}</span>
+          <span style="color:rgba(255,255,255,0.3);margin:0 8px">·</span>
+          <span style="font-size:14px;color:var(--mint)">${tgtMon[i] || m}</span>
+        </div>
+        ${micBtn(m + ' / ' + (tgtMon[i] || m))}
+      </div>`).join('')}
+    </div>`;
+}
+
+// ===== CLOSURE =====
+function endSession() {
+  stopTimer();
+  const tgt = LANGS.find(l => l.code === app.tgtLang);
+  const src = LANGS.find(l => l.code === app.srcLang);
+  document.getElementById('closure-title').textContent = 'Super échange ! 🎉';
+  document.getElementById('closure-msg').textContent =
+    `${T.thankyou[app.srcLang] || 'Merci'} — ${T.thankyou[app.tgtLang] || 'Thank you'}`;
+  document.getElementById('closure-byline').textContent =
+    `${src ? src.flag : ''} ${T.goodbye[app.srcLang] || 'Au revoir'} · ${tgt ? tgt.flag : ''} ${T.goodbye[app.tgtLang] || 'Goodbye'}`;
+  document.getElementById('contact-form').style.display = 'none';
+  go('screen-closure');
+}
+
+function showContact() {
+  document.getElementById('contact-form').style.display = 'block';
+  document.getElementById('inp-contact').focus();
+}
+
+function saveContact() {
+  const val = document.getElementById('inp-contact').value.trim();
+  if (!val) return;
+  const contacts = JSON.parse(localStorage.getItem('bim_contacts') || '[]');
+  contacts.push({ contact: val, date: new Date().toISOString(), partner: { src: app.srcLang, tgt: app.tgtLang } });
+  localStorage.setItem('bim_contacts', JSON.stringify(contacts));
+  document.getElementById('contact-form').innerHTML = `
+    <div class="card-glass" style="padding:20px;text-align:center">
+      <div style="font-size:40px;margin-bottom:10px">✅</div>
+      <p style="margin:0;color:var(--mint);font-weight:600">Contact sauvegardé !</p>
+      <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.4)">${val}</p>
+      <button class="btn-ghost" onclick="go('screen-home')" style="margin-top:14px">Retour à l'accueil</button>
+    </div>`;
+}
+
+// ===== PROFILE EDIT =====
+function renderProfileEdit() {
+  document.getElementById('edit-name').value = app.profile.name;
+  document.getElementById('edit-age').value = app.profile.age;
+  document.getElementById('edit-gender').value = app.profile.gender;
+  document.getElementById('edit-country').value = app.profile.country;
+  renderFlagGrid('edit-lang-src', app.srcLang, c => { app.srcLang = c; }, null);
+  renderFlagGrid('edit-lang-tgt', app.tgtLang, c => { app.tgtLang = c; }, null);
+}
+
+function resetApp() {
+  if (confirm('Réinitialiser toutes les données ?')) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+// ===== INIT =====
+function init() {
+  loadState();
+  renderFlagGrid('grid-source', app.srcLang, c => {
+    app.srcLang = c; saveState();
+    document.getElementById('btn-next-source').style.opacity = '1';
+    document.getElementById('btn-next-source').style.pointerEvents = 'auto';
+  }, 'btn-next-source');
+  renderFlagGrid('grid-target', app.tgtLang, c => {
+    app.tgtLang = c; saveState();
+    document.getElementById('btn-next-target').style.opacity = '1';
+    document.getElementById('btn-next-target').style.pointerEvents = 'auto';
+  }, 'btn-next-target');
+
+  if (app.srcLang) {
+    document.getElementById('btn-next-source').style.opacity = '1';
+    document.getElementById('btn-next-source').style.pointerEvents = 'auto';
+  }
+  if (app.tgtLang) {
+    document.getElementById('btn-next-target').style.opacity = '1';
+    document.getElementById('btn-next-target').style.pointerEvents = 'auto';
+  }
+
+  if (app.srcLang && app.tgtLang && app.profile.name) {
+    go('screen-home');
+  } else if (app.srcLang && app.tgtLang) {
+    go('screen-profile');
+  } else {
+    go('screen-splash');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
